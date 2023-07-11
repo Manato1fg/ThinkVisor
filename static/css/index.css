@@ -1,0 +1,464 @@
+body {
+  margin: 0;
+}
+html {
+  background-color: #ffffff;
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+#navbar-title {
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+#theme {
+  font-size: 0.85rem;
+}
+
+#cluster-div {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  width: 65%;
+  height: calc(100vh - 52px);
+}
+
+#represent-div {
+  position: absolute;
+  top: 52px;
+  right: 0px;
+  width: 35%;
+  height: calc(100vh - 52px);
+  background-color: white;
+  border-left: 1px solid #333;
+  padding-left: 10px;
+  margin-left: 10px;
+}
+
+#represent-comment {
+  height: 300px;
+  overflow-y: scroll;
+}
+
+#comment-card {
+  max-width: 600px;
+  margin-top: 50px;
+  box-shadow: 0px 14px 21px -14px #777777;
+  border-radius: 10px;
+  border: 1px solid #ededed;
+  margin: 30px 20px;
+}
+
+#comment-card .subtitle {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 1.35rem;
+}
+
+#comment-icon {
+  border-radius: 50%;
+  border: 1px solid #b8b7b7;
+}
+
+.mybutton {
+  border-radius: 50%;
+  border: none;
+  height: 5rem;
+  width: 5rem;
+  background-color: #7e7e7e;
+}
+
+/* 1024px以下の時 */
+@media screen and (max-width: 1024px) {
+  .mybutton {
+    border-radius: 50%;
+    border: none;
+    height: 4rem;
+    width: 4rem;
+    background-color: #7e7e7e;
+  }
+
+  .button-symbol {
+    font-size: 2rem;
+    color: #fff;
+  }
+}
+
+.mybutton:hover {
+  background-color: #b8b7b7;
+}
+
+.mybutton.is-danger {
+  background-color: #c30f33;
+}
+
+.mybutton.is-danger:hover {
+  background-color: #ff3860;
+}
+
+.mybutton.is-danger.selected {
+  background-color: #ff3860;
+}
+
+.mybutton.is-success {
+  background-color: #137a08;
+}
+
+.mybutton.is-success:hover {
+  background-color: #01ca26;
+}
+
+.mybutton.is-success.selected {
+  background-color: #01ca26;
+}
+.button-symbol {
+  font-size: 3rem;
+  color: #fff;
+}
+
+#button-controler1 {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+  position: relative;
+  left: 10%;
+  padding-bottom: 30px;
+}
+
+/* ボタンのアニメーション */
+.like_animation {
+  animation-name: likeAnime; /*アニメーションの定義名*/
+  animation-duration: 0.5s; /*アニメーション変化時間 ※デフォルト*/
+  animation-fill-mode: forwards; /*アニメーション終了時の挙動*/
+}
+
+/*アニメーションの開始から終了までを指定する*/
+@keyframes likeAnime {
+  from {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: rotate(-20deg);
+  }
+
+  80% {
+    transform: rotate(5deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* ボタンのアニメーション */
+.dislike_animation {
+  animation-name: dislikeAnime; /*アニメーションの定義名*/
+  animation-duration: 0.5s; /*アニメーション変化時間 ※デフォルト*/
+  animation-fill-mode: forwards; /*アニメーション終了時の挙動*/
+}
+
+/*アニメーションの開始から終了までを指定する*/
+@keyframes dislikeAnime {
+  from {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: rotate(-10deg) translateY(5px);
+  }
+
+  40% {
+    transform: rotate(8deg) translateY(-3px);
+  }
+
+  60% {
+    transform: rotate(-4deg) translateY(3px);
+  }
+
+  80% {
+    transform: rotate(2deg) translateY(-2px);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+#checkbox-controler {
+  display: flex;
+  width: 80%;
+  position: relative;
+  left: 10%;
+  padding-bottom: 20px;
+}
+
+#comment-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 50px;
+}
+
+#hover {
+  position: fixed;
+  z-index: 99;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: calc(100vh);
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.pane-name {
+  font-size: 0.8rem;
+  color: #d8d8d8;
+  padding: 7px;
+  font-weight: bold;
+  background-color: #333;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.pane-header {
+  font-size: 0.8rem;
+  color: #d8d8d8;
+  padding: 7px;
+  font-weight: bold;
+  background-color: #333;
+  border-radius: 5px 5px 0px 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pane-header a {
+  color: #d8d8d8;
+  text-decoration: none;
+}
+
+#chartWrapper {
+  /*border: 1px solid #999;*/
+  background-color: white;
+  margin: 0;
+  height: 30%;
+  width: 100%;
+}
+
+#analysisWrapper {
+  background-color: white;
+  margin: 0;
+  height: calc(100vh - 30% - 52px);
+  width: 100%;
+}
+
+#selectedCommentWrapper {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  background-color: white;
+  border-radius: 10px;
+}
+
+#selectedComment {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #6b6b6b;
+  line-height: 1.6;
+  word-break: break-all;
+  white-space: pre-wrap;
+  padding: 0.5rem 10px;
+  height: 268px;
+  overflow-y: scroll;
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+#relatedCommentsWrapper {
+  margin-top: 10px;
+  position: relative;
+  height: calc(100% - 320px);
+  width: 100%;
+  background-color: white;
+}
+
+#relatedComments {
+  position: relative;
+  height: calc(100% - 34px);
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.comment {
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.5;
+  word-break: break-all;
+  white-space: pre-wrap;
+  margin: 0px 15px;
+  padding: 0px 0px;
+  overflow-y: scroll;
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+.comment:first-child {
+  margin-top: 1rem;
+}
+
+.comment:last-child {
+  margin-bottom: 1rem;
+}
+
+#data-div .hr {
+  background-color: #9f9f9f;
+  margin: 43px 20px;
+}
+
+#data-div textarea {
+  position: relative;
+  top: 3px;
+  border-radius: 10px;
+}
+
+#ai-analysis {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#ai-analysis-button {
+  font-size: 1.4rem;
+  border: 2px solid #1e1bc0;
+  border-radius: 30px;
+  padding: 10px 20px;
+  color: #1e1bc0;
+}
+
+#ai-analysis-button :first-child {
+  top: 5px;
+  position: relative;
+  right: 4px;
+}
+
+#ai-analysis-button :last-child {
+  position: relative;
+  top: -10px;
+}
+
+#ai-analysis-button:hover {
+  background-color: #1e1bc0;
+  color: #fff;
+  cursor: pointer;
+}
+
+#ai-analysis-button.disabled {
+  background-color: #a6a6a6;
+  color: #fff;
+}
+
+#ai-analysis-button.disabled:hover {
+  cursor: not-allowed;
+}
+
+#ai-analysis-button .material-symbols-outlined {
+  font-size: 3rem;
+}
+
+#analysis-wrapper {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100vh);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#analysis-result {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 50%;
+  height: 80%;
+  border-radius: 10px;
+}
+
+#analysis-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+#analysis-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 20px;
+  border-bottom: 1px solid #d8d8d8;
+  color: #1e1bc0;
+  width: 80%;
+}
+
+#analysis-header span {
+  font-size: 2rem;
+  position: relative;
+  top: 5px;
+  right: 5px;
+}
+
+#analysis-header span:hover {
+  cursor: pointer;
+}
+
+#analysis-content {
+  overflow-y: scroll;
+  height: 80%;
+}
+
+#analysis-comment {
+  padding: 0px 25px;
+  font-size: 1.2rem;
+  line-height: 2;
+}
+
+#analysis-news-header {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 20px;
+  border-bottom: 1px solid #d8d8d8;
+  color: #8684f0;
+  width: 80%;
+}
+
+.news {
+  width: calc(100%-80px);
+  display: flex;
+  margin: 20px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  padding: 20px;
+}
+
+.news img {
+  width: 30%;
+  height: auto;
+}
+
+.news_title {
+  font-size: 1.3rem;
+}
+.news_title:hover {
+  cursor: pointer;
+}
+
+.perspective_title {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 20px;
+  color: #8684f0;
+  width: 80%;
+}
+
+.news_content_wrapper {
+  width: calc(70% - 10px);
+  position: relative;
+  left: 10px;
+  line-break: anywhere;
+}

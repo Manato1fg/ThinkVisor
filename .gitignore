@@ -1,0 +1,5 @@
+.prettierignore
+csv_reader.py
+venv
+__pycache__
+*.DS_Store

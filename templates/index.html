@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link href="static/css/loader.css" rel="stylesheet" />
+    <link href="static/css/index.css" rel="stylesheet" />
+    <title>プロジェクト演習グループC</title>
+  </head>
+  <body>
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item">
+            <h2 id='navbar-title'>
+                プロジェクト演習グループC
+            </h2>
+          </a>
+      
+          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+      
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                テーマ
+              </a>
+              <div class="navbar-dropdown">
+                <a class="navbar-item" onclick='changePage(0)'>
+                  寿司ペロ賠償請求
+                </a>
+                <a class="navbar-item" onclick='changePage(1)'>
+                  寿司ペロ賠償請求2
+                </a>
+                <a class="navbar-item" onclick='changePage(2)'>
+                  部活動の地域移行実験用
+                </a>
+              </div>
+            </div>
+            <div class="navbar-item">
+              <p id='theme'> {{title}} </p>
+            </div>
+          </div>  
+        </div>
+      </nav>
+    <div id='cluster-div'>
+      <div id='chartWrapper'>
+        <canvas id="topicChart"></canvas>
+      </div>
+      <div id='analysisWrapper'>
+        <canvas id="analysisChart"></canvas>
+      </div>
+    </div>
+    <div id='represent-div'>
+      <div class="card-content" id='comment-card'>
+        <img src='static/img/icon.png' width='64' height='64' id='comment-icon'>
+        <p class="subtitle" id='represent-comment'> {{ initial_comment }}</p>
+      </div>
+      <div id='button-controler1'>
+        <button class='mybutton' id='prev-button'>
+          <span class="material-symbols-outlined button-symbol">
+            undo
+          </span>
+        </button>
+        <button class='mybutton is-danger' id='dislike-button'>
+          <span class="material-symbols-outlined button-symbol">
+            thumb_down
+          </span>
+        </button>
+        <button class='mybutton is-success' id='like-button'>
+          <span class="material-symbols-outlined button-symbol">
+            thumb_up
+          </span>
+        </button>
+        <button class='mybutton' id='next-button'>
+          <span class="material-symbols-outlined button-symbol">
+            skip_next
+          </span>
+        </button>
+      </div>
+
+      <div id='ai-analysis'>
+        <div id='ai-analysis-button' class='disabled'><span class="material-symbols-outlined">neurology</span><span>あなたの意見をAIが分析&nbsp;0/5</span></div>
+      </div>
+        
+    </div>
+    <div id='analysis-wrapper'>
+      <div id='analysis-result'>
+        <div id='analysis-header'>
+          <h3 id='analysis-title'> AI分析結果 </h3>
+          <span class="material-symbols-outlined" id='analysis-close-button'>
+            close
+            </span>
+        </div>
+        <div id='analysis-content'>
+          <div id='analysis-comment' class='comment'></div>
+          <h3 id='analysis-news-header'>関連するニュース記事</h3>
+          <div id='analysis-news'><div class="myLoader">Loading...</div></div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="static/js/chartjs-plugin-zoom.min.js"></script>
+    <script src="static/js/bulma-toast.min.js"></script>
+    <script>
+        const sentences = JSON.parse('{{sentences_ja | tojson}}') // Flaskから送られてきた変数をグローバルに展開
+        const dataIndex = JSON.parse('{{ data_index | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        const randomIndices = JSON.parse('{{ random_indices | tojson }}') // Flaskから送られて きた変数をグローバルに展開
+        let topicIndex = JSON.parse('{{ initial_topic_index | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        const countForTopic = JSON.parse('{{ count_for_topic | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        let graphData = []
+        let sizeData = []
+        let max = -1
+        for(let i = 0; i < countForTopic.length; i++) {
+          graphData.push({
+            x: i * 20,
+            y: Math.random() * 20 - 10,
+          })
+          sizeData.push(countForTopic[i])
+          if (countForTopic[i] > max) max = countForTopic[i]
+        }
+        let hoverData = []
+        // 正規化
+        for(let i = 0; i < countForTopic.length; i++) {
+          sizeData[i] = sizeData[i] / max * 80 // 最大が80になるように正規化
+          hoverData.push(sizeData[i] * 1.1)
+        }
+        const mostLikelyTopics = JSON.parse('{{ most_likely_topics | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        const topics = JSON.parse('{{ topics | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        const probs = JSON.parse('{{ probs | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+        const maxCol = JSON.parse('{{ max_col | tojson }}') // Flaskから送られてきた変数をグローバルに展開
+    </script>
+    <script src="static/js/index.js"></script>
+  </body>
+</html>
