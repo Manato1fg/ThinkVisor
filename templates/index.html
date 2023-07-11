@@ -17,7 +17,7 @@
     <title>プロジェクト演習グループC</title>
   </head>
   <body>
-    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation" id='navbar'>
         <div class="navbar-brand">
           <a class="navbar-item">
             <h2 id='navbar-title'>
@@ -66,11 +66,11 @@
     </div>
     <div id='represent-div'>
       <div class="card-content" id='comment-card'>
-        <img src='static/img/icon.png' width='64' height='64' id='comment-icon'>
+        <img src='static/img/icon.png' width='56' height='56' id='comment-icon'>
         <p class="subtitle" id='represent-comment'> {{ initial_comment }}</p>
       </div>
       <div id='button-controler1'>
-        <button class='mybutton' id='prev-button'>
+        <button class='mysmallbutton' id='prev-button'>
           <span class="material-symbols-outlined button-symbol">
             undo
           </span>
@@ -85,7 +85,7 @@
             thumb_up
           </span>
         </button>
-        <button class='mybutton' id='next-button'>
+        <button class='mysmallbutton' id='next-button'>
           <span class="material-symbols-outlined button-symbol">
             skip_next
           </span>

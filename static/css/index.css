@@ -6,8 +6,13 @@ html {
   font-family: "Noto Sans JP", sans-serif;
 }
 
+#navbar {
+  background: #1a3c5e;
+  padding: 7px 2px;
+}
+
 #navbar-title {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #fff;
 }
 
@@ -18,8 +23,8 @@ html {
 #cluster-div {
   position: absolute;
   top: 52px;
-  left: 0;
-  width: 65%;
+  left: 15px;
+  width: 63%;
   height: calc(100vh - 52px);
 }
 
@@ -30,9 +35,14 @@ html {
   width: 35%;
   height: calc(100vh - 52px);
   background-color: white;
-  border-left: 1px solid #333;
+  border-left: 4px solid #e7eaec;
   padding-left: 10px;
   margin-left: 10px;
+}
+
+#topicChart {
+  position: relative;
+  top: 28px;
 }
 
 #represent-comment {
@@ -52,6 +62,7 @@ html {
 #comment-card .subtitle {
   font-family: "Noto Sans JP", sans-serif;
   font-size: 1.35rem;
+  color: #919191;
 }
 
 #comment-icon {
@@ -65,6 +76,24 @@ html {
   height: 5rem;
   width: 5rem;
   background-color: #7e7e7e;
+}
+
+.mysmallbutton {
+  border-radius: 50%;
+  border: none;
+  height: 3.5rem;
+  width: 3.5rem;
+  background-color: #d0dfdf;
+  font-size: 0.8rem;
+}
+
+.mysmallbutton .button-symbol {
+  font-size: 2rem;
+  color: #fff;
+}
+
+.mysmallbutton:hover {
+  background-color: #57a6ac;
 }
 
 /* 1024px以下の時 */
@@ -88,27 +117,31 @@ html {
 }
 
 .mybutton.is-danger {
-  background-color: #c30f33;
+  background-color: #d89eaa;
 }
 
 .mybutton.is-danger:hover {
-  background-color: #ff3860;
+  background-color: #ce4a4f;
 }
 
 .mybutton.is-danger.selected {
-  background-color: #ff3860;
+  background-color: #ce4a4f;
+}
+
+.mybutton.is-success .button-symbol {
+  color: #fff;
 }
 
 .mybutton.is-success {
-  background-color: #137a08;
+  background-color: #9ad2e1;
 }
 
 .mybutton.is-success:hover {
-  background-color: #01ca26;
+  background-color: #3278b9;
 }
 
 .mybutton.is-success.selected {
-  background-color: #01ca26;
+  background-color: #3278b9;
 }
 .button-symbol {
   font-size: 3rem;
@@ -224,7 +257,7 @@ html {
   color: #d8d8d8;
   padding: 7px;
   font-weight: bold;
-  background-color: #333;
+  background-color: #427582;
   border-radius: 5px 5px 0px 0px;
   display: flex;
   justify-content: space-between;
@@ -325,10 +358,12 @@ html {
 
 #ai-analysis-button {
   font-size: 1.4rem;
-  border: 2px solid #1e1bc0;
+  border: none;
+  border: 2px solid #a1c6c6;
   border-radius: 30px;
   padding: 10px 20px;
-  color: #1e1bc0;
+  background-color: #57a6ac;
+  color: #fff;
 }
 
 #ai-analysis-button :first-child {
@@ -343,17 +378,20 @@ html {
 }
 
 #ai-analysis-button:hover {
-  background-color: #1e1bc0;
+  background-color: #57a6ac;
   color: #fff;
+  border: none;
   cursor: pointer;
 }
 
 #ai-analysis-button.disabled {
-  background-color: #a6a6a6;
-  color: #fff;
+  background: white;
+  border: 2px solid #a1c6c6;
+  color: #57a6ac;
 }
 
 #ai-analysis-button.disabled:hover {
+  background-color: white;
   cursor: not-allowed;
 }
 
@@ -392,7 +430,7 @@ html {
   font-weight: bold;
   padding: 20px;
   border-bottom: 1px solid #d8d8d8;
-  color: #1e1bc0;
+  color: #355984;
   width: 80%;
 }
 
@@ -423,7 +461,7 @@ html {
   font-weight: bold;
   padding: 20px;
   border-bottom: 1px solid #d8d8d8;
-  color: #8684f0;
+  color: #355984;
   width: 80%;
 }
 
@@ -452,7 +490,7 @@ html {
   font-size: 1rem;
   font-weight: bold;
   padding: 20px;
-  color: #8684f0;
+  color: #9ac8d7;
   width: 80%;
 }
 

@@ -16,6 +16,7 @@ import sys
 
 from googleapiclient.discovery import build
 
+
 OPENAI_API_KEY = ""  # OpenAIのAPIキーを入れる
 openai.api_key = OPENAI_API_KEY
 

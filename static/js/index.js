@@ -11,9 +11,9 @@ function color(i, max) {
   let res = []
   for (let j = 0; j < max; j++) {
     if (j === i) {
-      res.push("#24c938")
+      res.push("#57a6ac")
     } else {
-      res.push("#aaaaaa")
+      res.push("#e6ecec")
     }
   }
   return res
@@ -61,7 +61,8 @@ function rgbToHex(rgb, a) {
 function _createColorArray(n) {
   let res = []
   for (let i = 0; i < n; i++) {
-    res.push(HSVtoRGB(i / n, 1, 1))
+    const color = i % 2 === 0 ? [216, 158, 170] : [154, 200, 215]
+    res.push(color)
   }
   return res
 }
@@ -74,7 +75,7 @@ function createColorArray(colors) {
   return res
 }
 
-function createColorArrayWithAlpha(colors, alpha = 0.2) {
+function createColorArrayWithAlpha(colors, alpha = 0.7) {
   let res = []
   for (let i = 0; i < colors.length; i++) {
     res.push(rgbToHex(colors[i], alpha))
