@@ -5,108 +5,57 @@ for (let i = 0; i < sentences.length; i++) {
   labels.push(sentences[i]) // ラベル用に
 }
 
-let preferences = [] // 自分の好み
-
-function color(i, max) {
-  let res = []
-  for (let j = 0; j < max; j++) {
-    if (j === i) {
-      res.push("#24c938")
-    } else {
-      res.push("#aaaaaa")
-    }
-  }
-  return res
-}
-
-// HSV色空間の生成
-function HSVtoRGB(h, s, v) {
-  let r, g, b
-  let i = Math.floor(h * 6)
-  let f = h * 6 - i
-  let p = v * (1 - s)
-  let q = v * (1 - f * s)
-  let t = v * (1 - (1 - f) * s)
-  switch (i % 6) {
-    case 0:
-      ;(r = v), (g = t), (b = p)
-      break
-    case 1:
-      ;(r = q), (g = v), (b = p)
-      break
-    case 2:
-      ;(r = p), (g = v), (b = t)
-      break
-    case 3:
-      ;(r = p), (g = q), (b = v)
-      break
-    case 4:
-      ;(r = t), (g = p), (b = v)
-      break
-    case 5:
-      ;(r = v), (g = p), (b = q)
-      break
-  }
-  return [r * 255, g * 255, b * 255]
-}
-
-function rgbToString(rgb) {
-  return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")"
-}
-
-function rgbToHex(rgb, a) {
-  return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")"
-}
-
-function _createColorArray(n) {
-  let res = []
-  for (let i = 0; i < n; i++) {
-    res.push(HSVtoRGB(i / n, 1, 1))
-  }
-  return res
-}
-
-function createColorArray(colors) {
-  let res = []
-  for (let i = 0; i < colors.length; i++) {
-    res.push(rgbToString(colors[i]))
-  }
-  return res
-}
-
-function createColorArrayWithAlpha(colors, alpha = 0.2) {
-  let res = []
-  for (let i = 0; i < colors.length; i++) {
-    res.push(rgbToHex(colors[i], alpha))
-  }
-  return res
-}
-
-let topicGraphData = {
-  labels: mostLikelyTopics,
+let data = {
+  labels: labels,
   datasets: [
     {
       label: "ユーザーの意見",
-      data: graphData,
+      data: embeddedData,
       borderColor: "#00000000",
-      backgroundColor: color(topicIndex, mostLikelyTopics.length),
+      backgroundColor: colors,
       pointStyle: "circle",
-      pointRadius: sizeData, // 60 +- 20
-      pointHoverRadius: hoverData,
+      pointRadius: pointSizes,
+      pointHoverRadius: hoverPointSizes,
     },
   ],
 }
 
-let topicGraphConfig = {
+let config = {
   type: "scatter",
-  data: topicGraphData,
+  data: data,
   options: {
     responsive: true,
-    maintainAspectRatio: false,
     onClick: async (e) => {
       if (e.chart.tooltip.opacity === 0) {
         return
       }
+      fetch(
+        `/neighbors?index=${idx}&sentCommentsEmbedded=${JSON.stringify(
+          sentCommentsEmbedded
+        )}&sentComments=${JSON.stringify(
+          sentComments
+        )}&data_index=${dataIndex}`,
+        {
+          method: "GET",
+        }
+      ).then((response) => {
+        if (response.ok) {
+          response.json().then((d) => {
+            document.getElementById("selectedComment").innerHTML =
+              d["the_sentence"]
+            let neighbors = d["neighbors"]
+            for (let i = 0; i < neighbors.length; i++) {
+              const nSentence = neighbors[i]
+              document.getElementById("neighbor" + (i + 1)).innerHTML =
+                nSentence
+            }
+            // 一番上にする
+            document.getElementById("relatedComments").scrollTo(0, 0)
+          })
+        } else {
+          console.log("Network response was not ok.")
+        }
+      })
     },
     interaction: {
       mode: "index",
@@ -138,21 +87,21 @@ let topicGraphConfig = {
             return ""
           },
           footer: function (context) {
-            return "クリックして観点別コメントを見る"
+            return "クリックしてコメントを表示"
           },
         },
       },
       zoom: {
         pan: {
-          enabled: false,
+          enabled: true,
           mode: "xy",
         },
         zoom: {
           wheel: {
-            enabled: false,
+            enabled: true,
           },
           pinch: {
-            enabled: false,
+            enabled: true,
           },
           mode: "xy",
           onZoomComplete({ chart }) {
@@ -165,297 +114,86 @@ let topicGraphConfig = {
   },
 }
 
-let _colors = _createColorArray(topics[topicIndex].length)
-let analysisData = {
-  // よく出てくる単語
-  labels: topics[topicIndex],
-  datasets: [
-    {
-      axis: "y",
-      label: "相対的な頻度",
-      data: probs[topicIndex],
-      fill: false,
-      backgroundColor: createColorArrayWithAlpha(_colors),
-      borderColor: createColorArray(_colors),
-      borderWidth: 1,
-    },
-  ],
-}
-let analysisConfig = {
-  type: "bar",
-  data: analysisData,
-  options: {
-    indexAxis: "y",
-    animation: false,
-  },
+function shortenString(sentence, length) {
+  if (sentence.length > length) {
+    return sentence.substring(0, length) + "..."
+  } else {
+    return sentence
+  }
 }
 
-const MIN_LIKE_COUNT = 5
+function resetZoom() {
+  if (window.myChart) {
+    window.myChart.zoomScale("x", { min: min_x, max: max_x }, "default")
+    window.myChart.zoomScale("y", { min: min_y, max: max_y }, "default")
+  }
+}
+
+function submitComment() {
+  const comment = document.getElementById("your-comment").value
+  if (comment === "") {
+    return
+  }
+  const button = document.getElementById("submit-button")
+  if (button.classList.contains("is-loading")) {
+    return
+  }
+  button.classList.add("is-loading")
+  formData = new FormData()
+  formData.append("comment", comment)
+  formData.append("data_index", dataIndex)
+  fetch("/comment", {
+    method: "POST",
+    body: formData,
+  }).then((response) => {
+    if (response.ok) {
+      response.json().then((d) => {
+        sentComments.push(comment)
+        sentCommentsEmbedded.push([d["x"], d["y"]])
+        data.datasets[0].data.push({ x: d["x"], y: d["y"] })
+        data.datasets[0].backgroundColor.push("#24c938") // 緑色
+        data.datasets[0].pointRadius.push(10)
+        data.datasets[0].pointHoverRadius.push(13)
+
+        labels.push(shortenString(comment, 20))
+        data.labels = labels
+        config.data = data
+
+        draw() // 再描画
+
+        sentences.push(comment)
+
+        bulmaToast.toast({
+          message: "意見を緑色の丸でプロットしました！",
+          type: "is-success",
+          position: "bottom-center",
+          duration: 2000,
+        })
+        button.classList.remove("is-loading")
+      })
+    } else {
+      console.log("Network response was not ok.")
+    }
+  })
+  document.getElementById("your-comment").value = ""
+}
 
 function changePage(page) {
   // ページの移動
   window.location.href = "/?data_index=" + page
 }
 
-function draw(animation = true) {
-  if (window.topicChart.destroy) {
-    window.topicChart.destroy()
-    window.topicChart = null
+function draw() {
+  if (window.myChart.destroy) {
+    window.myChart.destroy()
+    window.myChart = null
   }
-
-  if (window.analysisChart.destroy) {
-    window.analysisChart.destroy()
-    window.analysisChart = null
-  }
-  const ctx = document.getElementById("topicChart")
-  topicGraphConfig.options.animation = animation
-  window.topicChart = new Chart(ctx, topicGraphConfig) // 描画更新
-
-  const ctx2 = document.getElementById("analysisChart")
-  window.analysisChart = new Chart(ctx2, analysisConfig) // 描画更新
+  const ctx = document.getElementById("myChart")
+  window.myChart = new Chart(ctx, config) // 描画更新
 }
 
 let selectedComment = "まだコメントを選択していません"
 let idx = -1
+document.getElementById("selectedComment").innerHTML = selectedComment
 
-document.addEventListener("DOMContentLoaded", () => {
-  draw()
-  let commentIndex = 0
-  const maxCommentIndex = randomIndices.length - 1
-  const updateComment = () => {
-    fetch(
-      "/randomComment?data_index=" +
-        dataIndex +
-        "&index=" +
-        randomIndices[commentIndex]
-    ).then((response) => {
-      if (response.ok) {
-        response.json().then((d) => {
-          document.getElementById("represent-comment").textContent =
-            d["comment"]
-          //一番上にスクロール
-          document.getElementById("represent-comment").scrollTop = 0
-          document.getElementById("prev-button").disabled = false
-
-          if (topicIndex !== d["topic_index"]) {
-            // 色変更
-            topicGraphData.datasets[0].backgroundColor = color(
-              topicIndex,
-              mostLikelyTopics.length
-            )
-
-            analysisData.labels = topics[topicIndex]
-            analysisData.datasets[0].data = probs[topicIndex]
-            _colors = _createColorArray(topics[topicIndex].length)
-            analysisData.datasets[0].backgroundColor =
-              createColorArrayWithAlpha(_colors)
-            analysisData.datasets[0].borderColor = createColorArray(_colors)
-            // 再描画
-          }
-          topicIndex = d["topic_index"]
-          draw((animation = true))
-
-          const index = randomIndices[commentIndex]
-          for (let i = 0; i < preferences.length; i++) {
-            if (preferences[i].id === index) {
-              if (preferences[i].reaction === 1) {
-                likeButton.classList.add("selected")
-                dislikeButton.classList.remove("selected")
-              } else if (preferences[i].reaction === -1) {
-                dislikeButton.classList.add("selected")
-                likeButton.classList.remove("selected")
-              }
-              return
-            }
-          }
-          likeButton.classList.remove("selected")
-          dislikeButton.classList.remove("selected")
-        })
-      } else {
-        console.log("Network response was not ok.")
-      }
-    })
-  }
-
-  const ai_analysis = document.getElementById("ai-analysis-button")
-  function updateAnalysisButton() {
-    const innerHTML = `<span class="material-symbols-outlined">neurology</span><span>あなたの意見をAIが分析&nbsp;{{count}}</span>`
-    const count = preferences.filter((p) => p.reaction !== 0).length
-    ai_analysis.innerHTML = innerHTML.replace(
-      "{{count}}",
-      `${count} / ${MIN_LIKE_COUNT}`
-    )
-    if (count >= MIN_LIKE_COUNT) {
-      ai_analysis.classList.remove("disabled")
-    } else {
-      ai_analysis.classList.add("disabled")
-    }
-  }
-
-  ai_analysis.addEventListener("click", async () => {
-    if (ai_analysis.classList.contains("disabled")) {
-      return
-    }
-
-    document.getElementById("analysis-wrapper").style.display = "block"
-
-    formData = new FormData()
-    formData.append("preferences", JSON.stringify(preferences))
-    formData.append("data_index", dataIndex)
-
-    let commentPhase = true
-    let commentMD = ""
-    const decoder = new TextDecoder()
-    fetch("/analysis", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.body.getReader()
-        }
-      })
-      .then((reader) => {
-        function readChunk({ done, value }) {
-          if (done === true) {
-            return
-          }
-          if (decoder.decode(value) === "END_ANALYSIS") {
-            commentPhase = false
-            document.getElementById("analysis-comment").innerHTML =
-              md2html(commentMD)
-            reader.read().then(readChunk)
-            return
-          }
-          if (commentPhase) {
-            commentMD += decoder.decode(value)
-            document.getElementById("analysis-comment").innerHTML +=
-              decoder.decode(value)
-            // 改行が起きる時にMarkdownをHTMLに変換
-            if (decoder.decode(value).indexOf("\n") !== -1) {
-              document.getElementById("analysis-comment").innerHTML =
-                md2html(commentMD)
-            }
-          } else {
-            document.getElementById("analysis-news").innerHTML =
-              decoder.decode(value)
-          }
-
-          reader.read().then(readChunk)
-        }
-        reader.read().then(readChunk)
-      })
-  })
-  document.getElementById("next-button").addEventListener("click", () => {
-    if (commentIndex === maxCommentIndex) {
-      commentIndex = 0
-    }
-    commentIndex++
-    updateComment()
-  })
-  document.getElementById("prev-button").addEventListener("click", () => {
-    if (commentIndex > 0) {
-      commentIndex--
-      updateComment()
-    }
-    if (commentIndex === -1) {
-      document.getElementById("prev-button").disabled = true
-    }
-  })
-  document.getElementById("prev-button").disabled = true
-
-  const likeButton = document.getElementById("like-button")
-  const dislikeButton = document.getElementById("dislike-button")
-
-  likeButton.addEventListener("click", () => {
-    const icon = likeButton.getElementsByTagName("span")[0]
-    if (icon.classList.contains("like_animation")) {
-      icon.classList.remove("like_animation")
-    }
-    icon.offsetWidth
-    icon.classList.add("like_animation")
-
-    if (dislikeButton.classList.contains("selected")) {
-      dislikeButton.classList.remove("selected")
-    }
-    likeButton.classList.add("selected")
-    const index = randomIndices[commentIndex]
-    for (let i = 0; i < preferences.length; i++) {
-      if (preferences[i].id === index) {
-        preferences[i].reaction = 1
-        uopdateAnalysisButton()
-        return
-      }
-    }
-    preferences.push({ id: index, reaction: 1 })
-    updateAnalysisButton()
-  })
-
-  document.getElementById("dislike-button").addEventListener("click", () => {
-    const icon = document
-      .getElementById("dislike-button")
-      .getElementsByTagName("span")[0]
-    if (icon.classList.contains("dislike_animation")) {
-      icon.classList.remove("dislike_animation")
-    }
-    icon.offsetWidth
-    icon.classList.add("dislike_animation")
-
-    if (likeButton.classList.contains("selected")) {
-      likeButton.classList.remove("selected")
-    }
-    dislikeButton.classList.add("selected")
-    const index = randomIndices[commentIndex]
-    for (let i = 0; i < preferences.length; i++) {
-      if (preferences[i].id === index) {
-        preferences[i].reaction = -1
-        updateAnalysisButton()
-        return
-      }
-    }
-    preferences.push({ id: index, reaction: -1 })
-    updateAnalysisButton()
-  })
-
-  document.getElementById("analysis-close-button").onclick = () => {
-    document.getElementById("analysis-comment").innerHTML = ""
-    document.getElementById(
-      "analysis-news"
-    ).innerHTML = `<div class="myLoader">Loading...</div>`
-    document.getElementById("analysis-wrapper").style.display = "none"
-  }
-})
-
-function clickNews(target) {
-  const news_url = target.dataset.newsUrl
-  window.open(news_url, "_blank")
-}
-
-function md2html(md) {
-  paragraphs = md.split("\n\n")
-  html = ""
-  for (let i = 0; i < paragraphs.length; i++) {
-    lines = paragraphs[i].split("\n")
-    for (let j = 0; j < lines.length; j++) {
-      if (lines[j].startsWith("...")) {
-        continue
-      }
-      // 太字の変換
-      if (lines[j].indexOf("**") !== -1 && lines[j].split("**").length === 3) {
-        lines[j] = lines[j].replace("**", "<b>")
-        lines[j] = lines[j].replace("**", "</b>")
-      }
-
-      // リストの変換
-      if (lines[j].startsWith("- ")) {
-        html += `<li>${lines[j].slice(2)}</li>`
-      } else {
-        html += `<p>${lines[j]}</p>`
-      }
-    }
-    if (i !== paragraphs.length - 1) {
-      html += "<br />"
-    }
-  }
-  return html
-}
+document.addEventListener("DOMContentLoaded", draw)
