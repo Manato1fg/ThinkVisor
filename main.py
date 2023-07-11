@@ -10,25 +10,25 @@ import deepl
 from flask import Flask, render_template, request, jsonify
 
 
-DEEPL_API_KEY = ""  # deeplのAPIキーを入れる
+DEEPL_API_KEY = ""  # ここにdeeplのAPIキーを入れる
 translator = deepl.Translator(DEEPL_API_KEY)
 
 data = []
 data_index = 0
-DATA_COUNT = 2
-DATA_TITLE = ["部活動の地域移行", "寿司ペロ賠償請求"]
+DATA_COUNT = 3
+DATA_TITLE = ["ダミー", "寿司ペロ賠償請求", "部活動の地域移行"]
 
 
 def ENGLISH_FILE(i: int) -> str:
-    return f"translated{i}.csv"
+    return f"./data/translated{i}.csv"
 
 
 def JAPANESE_FILE(i: int) -> str:
-    return f"merge{i}.csv"
+    return f"./data/merge{i}.csv"
 
 
 def VECTOR_FILE(i: int) -> str:
-    return f"vector{i}.pickle"
+    return f"./data/vector{i}.pickle"
 
 
 MODEL_NAME = 'sentence-transformers/all-MiniLM-L6-v2'  # ベクトルに変換するためのモデル
