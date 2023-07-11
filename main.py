@@ -25,7 +25,7 @@ CSE_ID = ""  # Google Custom Search EngineのIDを入れる
 
 INSTRUCTION1 = """
 You are a professional AI assistant that analyzes the opinions of comments from the reactions.
-You will be given comments and reactions about "Regional migration of club activities" in JSON format, so you will need to analyze the trend of opinions based on that information and the reaction, and verbalize what kind of opinions the user has.
+You will be given comments and reactions in JSON format, so you will need to analyze the trend of opinions based on that information and the reaction, and verbalize what kind of opinions the user has.
 Reaction is an indicator to show whether the user likes that comment or not.
 Follow the instructions below.
 - You must explain especially what perspectives the user emphasizes.
