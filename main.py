@@ -30,7 +30,6 @@ Reaction is an indicator to show whether the user likes that comment or not.
 Follow the instructions below.
 - You must explain especially what perspectives the user emphasizes.
 - You don't have to explain the given comments and reactions.
-- You must answer what the user thinks about "Regional migration of club activities". 
 - You must answer in Japanese.
 - Your answer must follow FORMAT below. Replace {{something}} and {perspective} with your answer.
     - {{something}} must be written in fewer than 75 characters in Japanese.
